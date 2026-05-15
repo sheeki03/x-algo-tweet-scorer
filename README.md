@@ -113,6 +113,8 @@ Before going live:
 
 - Requires `Authorization: Bearer $CRON_SECRET`.
 - Reads OpenRouter key usage and logs spend-cap alerts.
+- No automatic schedule — invoke manually with `curl -H "Authorization: Bearer $CRON_SECRET" <site>/api/cron/spend-probe`.
+- Re-enable Vercel Cron by adding a `crons` array to `vercel.json` (requires Pro plan for sub-daily schedules).
 
 ## Privacy Disclosure
 

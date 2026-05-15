@@ -9,11 +9,5 @@
         }
       ]
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/cron/spend-probe",
-      "schedule": "0 12 * * *"
-    }
   ]
 }
