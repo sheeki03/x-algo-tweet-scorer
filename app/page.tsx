@@ -1,65 +1,186 @@
-import Image from "next/image";
+"use client";
+
+import { useCallback, useState } from "react";
+import Script from "next/script";
+import { HeaderV2 } from "@/components/sections/header-variants";
+import { HeroV2 } from "@/components/sections/hero-variants";
+import { ComposeV2 } from "@/components/sections/compose-variants";
+import { FindingsV2 } from "@/components/sections/findings-variants";
+import { FooterV2 } from "@/components/sections/footer-variants";
+import { PrivacyBanner } from "@/components/privacy-banner";
+import type {
+  ScoreResult,
+  ScoringInput,
+  SuggestionItem,
+} from "@/lib/scoring/types";
+
+const DEFAULT_INPUT: ScoringInput = {
+  text: "",
+  hasMedia: false,
+  videoHasAudio: false,
+  isReply: false,
+  isThread: false,
+  premiumLongPost: false,
+  newAccount: false,
+  tweetsInLastHour: 0,
+  targetFollowerSize: null,
+  modelOverride: null,
+};
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+
+type ApiError = {
+  error: string;
+  message?: string;
+  retryAfterSeconds?: number;
+  details?: { path?: (string | number)[]; message?: string }[];
+};
+
+function formatApiError(body: ApiError): string {
+  const detail = body.details?.[0];
+  const path = detail?.path?.length ? `${detail.path.join(".")}: ` : "";
+  const base =
+    body.message ??
+    (detail?.message ? `Request rejected: ${path}${detail.message}` : "Request rejected.");
+  return body.retryAfterSeconds
+    ? `${base} Try again in ${body.retryAfterSeconds}s.`
+    : base;
+}
+
+export type ByokConfig = {
+  enabled: boolean;
+  apiKey: string;
+  baseUrl: string;
+  modelId: string;
+};
+
+const DEFAULT_BYOK: ByokConfig = {
+  enabled: false,
+  apiKey: "",
+  baseUrl: "https://openrouter.ai/api/v1",
+  modelId: "",
+};
 
 export default function Home() {
+  const [input, setInput] = useState<ScoringInput>(DEFAULT_INPUT);
+  const [byok, setByok] = useState<ByokConfig>(DEFAULT_BYOK);
+  const [result, setResult] = useState<ScoreResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [turnstileRequired, setTurnstileRequired] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileResetNonce, setTurnstileResetNonce] = useState(0);
+
+  const scoreInput = useCallback(async (draft: ScoringInput) => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Site-funded scoring is locked to the bundled model. A model id is sent
+      // only when BYOK is enabled, so users cannot spend our key on arbitrary
+      // OpenRouter models.
+      const byokPayload = byok.enabled
+        ? {
+            openrouterApiKey: byok.apiKey || undefined,
+            openrouterBaseUrl: byok.baseUrl || undefined,
+          }
+        : {};
+      const modelOverride = byok.enabled
+        ? byok.modelId || null
+        : null;
+
+      const res = await fetch("/api/score", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          ...draft,
+          premiumLongPost: Boolean(draft.premiumLongPost),
+          modelOverride,
+          turnstileToken: turnstileToken ?? undefined,
+          ...byokPayload,
+        }),
+      });
+      if (
+        res.status === 429 ||
+        res.status === 413 ||
+        res.status === 403 ||
+        res.status === 400
+      ) {
+        const body = (await res.json()) as ApiError;
+        setError(formatApiError(body));
+        if (res.status === 403) {
+          setTurnstileRequired(true);
+          setTurnstileToken(null);
+          setTurnstileResetNonce((n) => n + 1);
+        }
+        return;
+      }
+      if (!res.ok) {
+        setError(`Server returned ${res.status}.`);
+        return;
+      }
+      const data = (await res.json()) as ScoreResult;
+      setResult(data);
+      setTurnstileRequired(data.turnstileRequired);
+      setTurnstileToken(null);
+      if (data.turnstileRequired) setTurnstileResetNonce((n) => n + 1);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Request failed.");
+    } finally {
+      setLoading(false);
+    }
+  }, [turnstileToken, byok]);
+
+  const submit = useCallback(async () => {
+    await scoreInput(input);
+  }, [input, scoreInput]);
+
+  const applySuggestion = useCallback((item: SuggestionItem) => {
+    const next = { ...input, text: item.suggestion };
+    setInput(next);
+    setResult(null);
+    void scoreInput(next);
+  }, [input, scoreInput]);
+
+  const settings = {
+    byok,
+    onByokChange: setByok,
+  };
+
+  const composeProps = {
+    input,
+    setInput,
+    submit,
+    loading,
+    error,
+    turnstileRequired,
+    turnstileSiteKey: TURNSTILE_SITE_KEY,
+    turnstileResetNonce,
+    turnstileSatisfied: !turnstileRequired || !TURNSTILE_SITE_KEY || Boolean(turnstileToken),
+    onTurnstileToken: setTurnstileToken,
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="relative isolate flex-1">
+      {TURNSTILE_SITE_KEY && (
+        <Script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          strategy="afterInteractive"
+          async
+          defer
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      )}
+
+      <div className="v-lightsout flex min-h-dvh flex-col">
+        <HeaderV2 {...settings} />
+        <HeroV2 />
+        <ComposeV2 {...composeProps} />
+        {result && (
+          <FindingsV2 result={result} applySuggestion={applySuggestion} />
+        )}
+        <FooterV2 />
+      </div>
+
+      <PrivacyBanner />
+    </main>
   );
 }

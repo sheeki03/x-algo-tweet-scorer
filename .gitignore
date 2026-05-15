@@ -30,8 +30,17 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# package manager — project uses bun; ignore others
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+
+# claude / agent artifacts (no need to publish these)
+.claude/
+
 # env files (can opt-in for committing if needed)
 .env*
+!.env.local.example
 
 # vercel
 .vercel

@@ -1,26 +1,220 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=JetBrains+Mono:wght@400..600&family=Fraunces:ital,opsz,wght@0,9..144,200..900;1,9..144,200..900&display=swap");
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
+
+/* ─────────────────────────────────────────────────────────────
+   X / TWITTER COLOR SYSTEM — Lights Out Editorial.
+
+     Twitter Blue        #1D9BF0   oklch(0.66 0.20 245)
+     Twitter Blue hover  #1A8CD8   oklch(0.60 0.20 245)
+     Lights Out canvas   #000000
+     Lights Out canvas-2 #16181C   oklch(0.16 0.005 250)
+     Lights Out canvas-3 #1E2226   oklch(0.21 0.005 250)
+     Lights Out ink      #E7E9EA   oklch(0.91 0.005 240)
+     Lights Out secondary#71767B   oklch(0.55 0.005 250)
+     Pos green           #00BA7C   oklch(0.66 0.16 165)
+     Neg red             #F4212E   oklch(0.62 0.24 25)
+     Warn yellow         #FFD400   oklch(0.86 0.18 95)
+   ───────────────────────────────────────────────────────────── */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-canvas: var(--canvas);
+  --color-canvas-2: var(--canvas-2);
+  --color-canvas-3: var(--canvas-3);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+
+  --color-tw-blue: var(--tw-blue);
+  --color-tw-blue-soft: var(--tw-blue-soft);
+  --color-tw-blue-hover: var(--tw-blue-hover);
+  --color-tw-blue-ink: var(--tw-blue-ink);
+
+  --color-pos: var(--pos);
+  --color-pos-soft: var(--pos-soft);
+  --color-neg: var(--neg);
+  --color-neg-soft: var(--neg-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-serif: "Fraunces", ui-serif, Georgia, serif;
+  --font-heading: var(--font-display);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 28px;
+  --radius-4xl: 9999px;
+  --radius: 9999px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Lights Out is the only theme. Apply via .v-lightsout for safety,
+   or rely on the :root defaults — both reach the same values. */
+:root,
+.v-lightsout {
+  --canvas: #000000;
+  --canvas-2: oklch(0.16 0.005 250);
+  --canvas-3: oklch(0.21 0.005 250);
+  --ink: oklch(0.91 0.005 240);
+  --ink-soft: oklch(0.66 0.012 245);
+  --ink-faint: oklch(0.50 0.012 245);
+  --hairline: oklch(0.30 0.005 250);
+  --hairline-strong: oklch(0.42 0.008 250);
+
+  --tw-blue: oklch(0.72 0.20 245);
+  --tw-blue-soft: oklch(0.72 0.20 245 / 0.20);
+  --tw-blue-hover: oklch(0.66 0.22 245);
+  --tw-blue-ink: #000000;
+
+  --pos: oklch(0.74 0.18 165);
+  --pos-soft: oklch(0.74 0.18 165 / 0.20);
+  --neg: oklch(0.70 0.24 25);
+  --neg-soft: oklch(0.70 0.24 25 / 0.20);
+  --warn: oklch(0.86 0.18 95);
+  --warn-soft: oklch(0.86 0.18 95 / 0.20);
+
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --card: var(--canvas-2);
+  --card-foreground: var(--ink);
+  --popover: var(--canvas-2);
+  --popover-foreground: var(--ink);
+  --primary: var(--tw-blue);
+  --primary-foreground: #ffffff;
+  --secondary: var(--canvas-3);
+  --secondary-foreground: var(--ink);
+  --muted: var(--canvas-2);
+  --muted-foreground: var(--ink-faint);
+  --accent: var(--tw-blue-soft);
+  --accent-foreground: var(--tw-blue);
+  --destructive: var(--neg);
+  --border: var(--hairline);
+  --input: var(--hairline-strong);
+  --ring: oklch(0.72 0.20 245 / 0.5);
+  --chart-1: var(--tw-blue);
+  --chart-2: var(--ink-soft);
+  --chart-3: var(--ink-faint);
+  --chart-4: var(--pos);
+  --chart-5: var(--neg);
+  --sidebar: var(--canvas);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--tw-blue);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--canvas-3);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--hairline);
+  --sidebar-ring: oklch(0.72 0.20 245 / 0.5);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
+  html, body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+  }
+  html {
+    background-color: #000000;
+    background-image:
+      radial-gradient(ellipse 1200px 700px at 10% -5%, oklch(0.72 0.20 245 / 0.16), transparent 60%),
+      radial-gradient(ellipse 1000px 600px at 100% 100%, oklch(0.72 0.20 245 / 0.08), transparent 60%);
+    background-attachment: fixed;
+  }
+
+  .font-display { font-family: var(--font-display); }
+  .font-mono    { font-family: var(--font-mono); }
+  .font-serif   { font-family: var(--font-serif); }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ─── Utilities ────────────────────────────────────────────── */
+
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+@utility tick {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.005em;
+}
+
+@utility hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    color-mix(in oklch, var(--ink) 6%, transparent) 0px,
+    color-mix(in oklch, var(--ink) 6%, transparent) 1px,
+    transparent 1px,
+    transparent 6px
+  );
+}
+
+@utility pill { border-radius: 9999px; }
+
+@keyframes rise-kf {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@utility rise {
+  animation: rise-kf 540ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.45; transform: scale(1.4); }
+}
+@utility live-dot {
+  animation: live-pulse 1.6s ease-in-out infinite;
+}
+
+::selection {
+  background-color: color-mix(in oklch, var(--tw-blue) 38%, transparent);
+  color: var(--ink);
 }
