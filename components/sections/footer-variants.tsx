@@ -20,7 +20,7 @@ export function FooterV2() {
           {PRIVACY}
         </p>
         <a
-          href="https://github.com/xai-org/x-algorithm"
+          href="https://github.com/sheeki03/x-algo-tweet-scorer"
           target="_blank"
           rel="noreferrer"
           className="mt-8 inline-flex h-11 items-center rounded-full bg-tw-blue px-6 text-[14px] font-semibold text-white hover:bg-tw-blue-hover"

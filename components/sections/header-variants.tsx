@@ -25,7 +25,7 @@ export function HeaderV2(props: Props) {
         </Link>
         <div className="flex items-center gap-6">
           <a
-            href="https://github.com/xai-org/x-algorithm"
+            href="https://github.com/sheeki03/x-algo-tweet-scorer"
             target="_blank"
             rel="noreferrer"
             className="tick hidden text-[11px] uppercase tracking-[0.18em] text-ink-faint hover:text-tw-blue sm:inline"

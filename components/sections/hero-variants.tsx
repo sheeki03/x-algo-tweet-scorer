@@ -10,12 +10,8 @@ export function HeroV2() {
   return (
     <section className="v-lightsout relative border-b border-hairline">
       <div className="mx-auto max-w-[1180px] px-6 py-24 text-center sm:px-10 sm:py-32">
-        <p className="eyebrow rise inline-flex items-center gap-2">
-          <span className="size-1 rounded-full bg-tw-blue" />
-          Field instrument · uncalibrated
-        </p>
         <h1
-          className="rise font-serif mx-auto mt-8 text-balance leading-[0.9] tracking-tight text-ink [animation-delay:60ms]"
+          className="rise font-serif mx-auto text-balance leading-[0.9] tracking-tight text-ink"
           style={{
             maxWidth: "16ch",
             fontSize: "clamp(3rem, 9vw, 7.5rem)",
