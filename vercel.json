@@ -13,7 +13,7 @@
   "crons": [
     {
       "path": "/api/cron/spend-probe",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 12 * * *"
     }
   ]
 }
