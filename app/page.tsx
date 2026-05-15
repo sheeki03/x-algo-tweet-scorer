@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import { HeaderV2 } from "@/components/sections/header-variants";
 import { HeroV2 } from "@/components/sections/hero-variants";
@@ -70,6 +70,20 @@ export default function Home() {
   const [turnstileRequired, setTurnstileRequired] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [turnstileResetNonce, setTurnstileResetNonce] = useState(0);
+  const findingsRef = useRef<HTMLDivElement | null>(null);
+
+  // Auto-scroll to the Findings section when a fresh result lands so the user
+  // is taken to "What the algorithm sees." without hunting for it.
+  useEffect(() => {
+    if (!result) return;
+    const id = requestAnimationFrame(() => {
+      findingsRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [result]);
 
   const scoreInput = useCallback(async (draft: ScoringInput) => {
     setLoading(true);
@@ -175,7 +189,9 @@ export default function Home() {
         <HeroV2 />
         <ComposeV2 {...composeProps} />
         {result && (
-          <FindingsV2 result={result} applySuggestion={applySuggestion} />
+          <div ref={findingsRef} aria-live="polite">
+            <FindingsV2 result={result} applySuggestion={applySuggestion} />
+          </div>
         )}
         <FooterV2 />
       </div>
